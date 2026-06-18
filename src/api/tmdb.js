@@ -23,8 +23,13 @@ const handleRequest = async (request) => {
 };
 
 // Generic GET helper
-const get = (endpoint, params = {}) => {
+export const get = (endpoint, params = {}) => {
   return handleRequest(tmdbApi.get(endpoint, { params }));
+};
+
+export const getImageUrl = (path, size = 'original') => {
+  if (!path) return null;
+  return `https://image.tmdb.org/t/p/${size}${path}`;
 };
 
 // TMDB Service Methods

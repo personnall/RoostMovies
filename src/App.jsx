@@ -3,16 +3,19 @@ import AppRoutes from './routes';
 import { ThemeProvider } from './context/ThemeContext';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { WatchlistProvider } from './context/WatchlistContext';
+import { GenreProvider } from './context/GenreContext';
 import './styles/global.css';
 
 function App() {
   return (
     <ThemeProvider>
-      <FavoritesProvider>
-        <WatchlistProvider>
-          <AppRoutes />
-        </WatchlistProvider>
-      </FavoritesProvider>
+      <GenreProvider>
+        <FavoritesProvider>
+          <WatchlistProvider>
+            <AppRoutes />
+          </WatchlistProvider>
+        </FavoritesProvider>
+      </GenreProvider>
     </ThemeProvider>
   );
 }

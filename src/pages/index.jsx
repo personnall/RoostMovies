@@ -9,9 +9,13 @@ const PagePlaceholder = ({ title }) => {
   );
 };
 
-export const Home = () => <PagePlaceholder title="Home" />;
+import Home from './Home';
+export { Home };
 export const Movies = () => <PagePlaceholder title="Movies" />;
 export const TVShows = () => <PagePlaceholder title="TV Shows" />;
+export const Popular = () => <PagePlaceholder title="Popular" />;
+export const TopRated = () => <PagePlaceholder title="Top Rated" />;
+export const People = () => <PagePlaceholder title="People" />;
 export const MovieDetails = () => <PagePlaceholder title="Movie Details" />;
 export const TVDetails = () => <PagePlaceholder title="TV Details" />;
 export const PersonDetails = () => <PagePlaceholder title="Person Details" />;

@@ -1,0 +1,147 @@
+.skeleton {
+  background-color: var(--secondary-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(255, 255, 255, 0.1) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-line {
+  background-color: var(--card-bg);
+  height: 1rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+/* Movie Card Skeleton */
+.card-skeleton {
+  width: 100%;
+  aspect-ratio: 2/3;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.skeleton-image {
+  flex: 1;
+  background-color: var(--card-bg);
+}
+
+.skeleton-info {
+  padding: 1rem 0;
+}
+
+.title-line {
+  width: 80%;
+}
+
+.small-line {
+  width: 40%;
+}
+
+/* Section Skeleton */
+.section-skeleton {
+  margin-bottom: 3rem;
+}
+
+.section-title-line {
+  width: 200px;
+  height: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.skeleton-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 1280px) {
+  .skeleton-row {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .skeleton-row {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .skeleton-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .skeleton-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Hero Skeleton */
+.hero-skeleton {
+  height: 80vh;
+  width: 100%;
+  border-radius: 20px;
+  margin-bottom: 3rem;
+  display: flex;
+  align-items: center;
+  padding: 0 4rem;
+}
+
+.skeleton-hero-content {
+  width: 50%;
+}
+
+.hero-logo-line {
+  width: 300px;
+  height: 60px;
+  margin-bottom: 2rem;
+}
+
+.hero-info-line {
+  width: 200px;
+  margin-bottom: 1.5rem;
+}
+
+.hero-desc-line {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-hero-btns {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.skeleton-btn {
+  width: 140px;
+  height: 45px;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+}

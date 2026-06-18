@@ -7,6 +7,9 @@ const Sidebar = ({ isOpen, onClose }) => {
     { name: 'Home', path: '/', icon: 'ri-home-4-line' },
     { name: 'Movies', path: '/movies', icon: 'ri-movie-2-line' },
     { name: 'TV Shows', path: '/tv', icon: 'ri-tv-2-line' },
+    { name: 'Popular', path: '/popular', icon: 'ri-fire-line' },
+    { name: 'Top Rated', path: '/top-rated', icon: 'ri-star-line' },
+    { name: 'People', path: '/people', icon: 'ri-user-heart-line' },
     { name: 'Search', path: '/search', icon: 'ri-search-line' },
   ];
 
@@ -24,6 +27,14 @@ const Sidebar = ({ isOpen, onClose }) => {
       ></div>
 
       <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="logo">
+            <i className="ri-play-circle-fill logo-icon"></i>
+            <span className="logo-roost">Roost</span>
+            <span className="logo-movies">Movies</span>
+          </div>
+        </div>
+
         <div className="sidebar-content">
           <nav className="sidebar-nav">
             <p className="nav-label">Menu</p>

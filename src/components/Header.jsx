@@ -6,21 +6,25 @@ const Header = ({ onMenuClick }) => {
     <header className="header">
       <div className="header-left">
         <button className="menu-toggle" onClick={onMenuClick}>
-          <i className="ri-menu-line"></i>
+          <i className="ri-menu-2-line"></i>
         </button>
-        <div className="logo">
-          <span className="logo-roost">Roost</span>
-          <span className="logo-movies">Movies</span>
-        </div>
       </div>
 
       <div className="header-right">
-        <div className="search-bar">
+        <div className="header-search">
           <i className="ri-search-line"></i>
           <input type="text" placeholder="Search movies, tv shows, people..." />
         </div>
-        <div className="user-profile">
-          <i className="ri-user-3-line"></i>
+        <div className="header-actions">
+          <button className="icon-btn">
+            <i className="ri-notification-3-line"></i>
+          </button>
+          <div className="user-profile">
+            <img
+              src="https://api.dicebear.com/7.x/avataaars/svg?seed=Roost"
+              alt="User Avatar"
+            />
+          </div>
         </div>
       </div>
     </header>
