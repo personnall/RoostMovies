@@ -1,4 +1,13 @@
-import React from 'react';
+import Home from './Home';
+import Search from './Search';
+import MovieDetails from './MovieDetails';
+import TVDetails from './TVDetails';
+import PersonDetails from './PersonDetails';
+import Favorites from './Favorites';
+import Watchlist from './Watchlist';
+import Player from './Player';
+
+export { Home, Search, MovieDetails, TVDetails, PersonDetails, Favorites, Watchlist, Player };
 
 const PagePlaceholder = ({ title }) => {
   return (
@@ -9,32 +18,8 @@ const PagePlaceholder = ({ title }) => {
   );
 };
 
-import Home from './Home';
-export { Home };
 export const Movies = () => <PagePlaceholder title="Movies" />;
 export const TVShows = () => <PagePlaceholder title="TV Shows" />;
 export const Popular = () => <PagePlaceholder title="Popular" />;
 export const TopRated = () => <PagePlaceholder title="Top Rated" />;
 export const People = () => <PagePlaceholder title="People" />;
-export const MovieDetails = () => <PagePlaceholder title="Movie Details" />;
-export const TVDetails = () => <PagePlaceholder title="TV Details" />;
-export const PersonDetails = () => <PagePlaceholder title="Person Details" />;
-export const Search = () => <PagePlaceholder title="Search" />;
-export const Favorites = () => <PagePlaceholder title="Favorites" />;
-export const Watchlist = () => <PagePlaceholder title="Watchlist" />;
-export const Player = () => (
-  <div className="player-page">
-    <h1>Player</h1>
-    <div className="player-container" style={{
-      aspectRatio: '16/9',
-      backgroundColor: '#000',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      border: '1px solid var(--border)',
-      marginTop: '2rem'
-    }}>
-      <p style={{ color: 'var(--secondary-text)' }}>Video Player Placeholder</p>
-    </div>
-  </div>
-);

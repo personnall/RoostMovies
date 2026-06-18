@@ -9,7 +9,6 @@ const Sidebar = ({ isOpen, onClose }) => {
     { name: 'TV Shows', path: '/tv', icon: 'ri-tv-2-line' },
     { name: 'Popular', path: '/popular', icon: 'ri-fire-line' },
     { name: 'Top Rated', path: '/top-rated', icon: 'ri-star-line' },
-    { name: 'People', path: '/people', icon: 'ri-user-heart-line' },
     { name: 'Search', path: '/search', icon: 'ri-search-line' },
   ];
 

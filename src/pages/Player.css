@@ -1,0 +1,127 @@
+.player-page {
+  background-color: #000;
+  min-height: 100vh;
+  margin: -2rem -2rem; /* Negate Layout padding */
+  padding: 2rem;
+}
+
+.player-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--secondary-text);
+  transition: color 0.3s;
+}
+
+.back-btn:hover {
+  color: var(--primary-text);
+}
+
+.player-info-mini {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.mini-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.mini-meta {
+  color: var(--primary-accent);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.video-aspect-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.video-placeholder {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.video-overlay i {
+  font-size: 5rem;
+  color: var(--primary-accent);
+}
+
+.video-overlay p {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.video-overlay span {
+  color: var(--secondary-text);
+}
+
+.player-footer {
+  margin-top: 3rem;
+  max-width: 1000px;
+}
+
+.player-details h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.player-overview {
+  color: var(--secondary-text);
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+.player-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  font-size: 1.5rem;
+  color: var(--secondary-text);
+}
+
+@media (max-width: 768px) {
+  .player-page {
+    margin: -1rem;
+    padding: 1rem;
+  }
+
+  .mini-title {
+    font-size: 1.1rem;
+  }
+
+  .video-overlay i {
+    font-size: 3rem;
+  }
+}
