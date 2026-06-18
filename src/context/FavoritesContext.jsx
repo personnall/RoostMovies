@@ -1,12 +1,16 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext } from 'react';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const FavoritesContext = createContext();
 
 export const FavoritesProvider = ({ children }) => {
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useLocalStorage('roost_favorites', []);
 
   const addToFavorites = (item) => {
-    setFavorites((prev) => [...prev, item]);
+    setFavorites((prev) => {
+      if (prev.some((i) => i.id === item.id)) return prev;
+      return [item, ...prev];
+    });
   };
 
   const removeFromFavorites = (id) => {

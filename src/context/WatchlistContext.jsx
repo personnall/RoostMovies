@@ -1,12 +1,16 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext } from 'react';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const WatchlistContext = createContext();
 
 export const WatchlistProvider = ({ children }) => {
-  const [watchlist, setWatchlist] = useState([]);
+  const [watchlist, setWatchlist] = useLocalStorage('roost_watchlist', []);
 
   const addToWatchlist = (item) => {
-    setWatchlist((prev) => [...prev, item]);
+    setWatchlist((prev) => {
+      if (prev.some((i) => i.id === item.id)) return prev;
+      return [item, ...prev];
+    });
   };
 
   const removeFromWatchlist = (id) => {

@@ -6,8 +6,25 @@ import PersonDetails from './PersonDetails';
 import Favorites from './Favorites';
 import Watchlist from './Watchlist';
 import Player from './Player';
+import Movies from './Movies';
+import TVShows from './TVShows';
+import History from './History';
+import NotFound from './NotFound';
 
-export { Home, Search, MovieDetails, TVDetails, PersonDetails, Favorites, Watchlist, Player };
+export {
+  Home,
+  Search,
+  MovieDetails,
+  TVDetails,
+  PersonDetails,
+  Favorites,
+  Watchlist,
+  Player,
+  Movies,
+  TVShows,
+  History,
+  NotFound
+};
 
 const PagePlaceholder = ({ title }) => {
   return (
@@ -18,8 +35,6 @@ const PagePlaceholder = ({ title }) => {
   );
 };
 
-export const Movies = () => <PagePlaceholder title="Movies" />;
-export const TVShows = () => <PagePlaceholder title="TV Shows" />;
 export const Popular = () => <PagePlaceholder title="Popular" />;
 export const TopRated = () => <PagePlaceholder title="Top Rated" />;
 export const People = () => <PagePlaceholder title="People" />;

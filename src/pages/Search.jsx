@@ -4,6 +4,7 @@ import { tmdbServices, getImageUrl } from '../api/tmdb';
 import { useDebounce } from '../hooks/useDebounce';
 import MovieCard from '../components/MovieCard';
 import { SectionSkeleton } from '../components/Skeletons';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import './Search.css';
 
 const Search = () => {
@@ -11,40 +12,64 @@ const Search = () => {
   const [activeTab, setActiveTab] = useState('movie'); // movie, tv, person
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const debouncedQuery = useDebounce(query, 500);
 
-  const fetchResults = useCallback(async () => {
+  const fetchResults = useCallback(async (isNextPage = false) => {
     if (!debouncedQuery) {
       setResults([]);
+      setHasMore(false);
       return;
     }
 
     setLoading(true);
     try {
       let res;
+      const currentPage = isNextPage ? page + 1 : 1;
+
       if (activeTab === 'movie') {
-        res = await tmdbServices.searchMovies(debouncedQuery);
+        res = await tmdbServices.searchMovies(debouncedQuery, currentPage);
       } else if (activeTab === 'tv') {
-        res = await tmdbServices.searchTV(debouncedQuery);
+        res = await tmdbServices.searchTV(debouncedQuery, currentPage);
       } else {
-        res = await tmdbServices.searchPeople(debouncedQuery);
+        res = await tmdbServices.searchPeople(debouncedQuery, currentPage);
       }
-      setResults(res.results);
+
+      if (isNextPage) {
+        setResults((prev) => [...prev, ...res.results]);
+        setPage(currentPage);
+      } else {
+        setResults(res.results);
+        setPage(1);
+      }
+
+      setHasMore(res.page < res.total_pages);
     } catch (error) {
       console.error('Search failed:', error);
     } finally {
       setLoading(false);
     }
-  }, [debouncedQuery, activeTab]);
+  }, [debouncedQuery, activeTab, page]);
 
   useEffect(() => {
-    fetchResults();
-  }, [fetchResults]);
+    fetchResults(false);
+  }, [debouncedQuery, activeTab]);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setResults([]);
+    setPage(1);
+    setHasMore(false);
   };
+
+  const loadMore = useCallback(() => {
+    if (!loading && hasMore) {
+      fetchResults(true);
+    }
+  }, [loading, hasMore, fetchResults]);
+
+  const observerTarget = useInfiniteScroll(loadMore, [loading, hasMore]);
 
   return (
     <div className="search-page">
@@ -83,29 +108,36 @@ const Search = () => {
       </div>
 
       <div className="search-results">
-        {loading ? (
+        {results.length > 0 ? (
+          <>
+            <div className="results-grid">
+              {results.map((item, index) => (
+                activeTab === 'person' ? (
+                  <Link to={`/person/${item.id}`} key={`${item.id}-${index}`} className="person-card">
+                    <div className="person-image">
+                      <img
+                        src={getImageUrl(item.profile_path, 'w500') || 'https://via.placeholder.com/500x500?text=No+Image'}
+                        alt={item.name}
+                      />
+                    </div>
+                    <div className="person-info">
+                      <h3 className="person-name">{item.name}</h3>
+                      <p className="person-known">{item.known_for_department}</p>
+                    </div>
+                  </Link>
+                ) : (
+                  <MovieCard key={`${item.id}-${index}`} item={item} type={activeTab} />
+                )
+              ))}
+            </div>
+            {(loading || hasMore) && (
+              <div ref={observerTarget} className="infinite-loader" style={{ marginTop: '2rem' }}>
+                {loading && <SectionSkeleton />}
+              </div>
+            )}
+          </>
+        ) : loading ? (
           <SectionSkeleton />
-        ) : results.length > 0 ? (
-          <div className="results-grid">
-            {results.map((item) => (
-              activeTab === 'person' ? (
-                <Link to={`/person/${item.id}`} key={item.id} className="person-card">
-                  <div className="person-image">
-                    <img
-                      src={getImageUrl(item.profile_path, 'w500') || 'https://via.placeholder.com/500x500?text=No+Image'}
-                      alt={item.name}
-                    />
-                  </div>
-                  <div className="person-info">
-                    <h3 className="person-name">{item.name}</h3>
-                    <p className="person-known">{item.known_for_department}</p>
-                  </div>
-                </Link>
-              ) : (
-                <MovieCard key={item.id} item={item} type={activeTab} />
-              )
-            ))}
-          </div>
         ) : debouncedQuery ? (
           <div className="empty-state">
             <i className="ri-search-eye-line"></i>
