@@ -1,31 +1,16 @@
 import React from 'react';
-import { useWatchlist } from '../context/WatchlistContext';
-import MovieCard from '../components/MovieCard';
-import './Lists.css';
 
 const Watchlist = () => {
-  const { watchlist } = useWatchlist();
-
   return (
-    <div className="lists-page">
-      <div className="list-header">
-        <h1>My Watchlist</h1>
-        <p>{watchlist.length} {watchlist.length === 1 ? 'item' : 'items'}</p>
+    <div className="min-h-screen bg-background pt-32 pb-20">
+      <div className="container mx-auto px-4 md:px-8 text-center">
+        <h1 className="text-4xl font-poppins font-black uppercase tracking-tighter mb-12 italic">
+          Scheduled: <span className="text-accent">Watchlist</span>
+        </h1>
+        <div className="glass py-20 rounded-3xl border border-dashed border-white/10">
+           <p className="text-white/40">Your queue is currently empty.</p>
+        </div>
       </div>
-
-      {watchlist.length === 0 ? (
-        <div className="empty-list">
-          <i className="ri-bookmark-line"></i>
-          <h2>Your watchlist is empty</h2>
-          <p>Add movies and TV shows to watch later!</p>
-        </div>
-      ) : (
-        <div className="list-grid">
-          {watchlist.map((item) => (
-            <MovieCard key={item.id} item={item} type={item.media_type || (item.title ? 'movie' : 'tv')} />
-          ))}
-        </div>
-      )}
     </div>
   );
 };

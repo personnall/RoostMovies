@@ -61,6 +61,7 @@ export const tmdbServices = {
 
   // People
   getPersonDetails: (id) => get(`/person/${id}`),
+  getPersonCombinedCredits: (id) => get(`/person/${id}/combined_credits`),
 
   // Search
   searchMovies: (query, page = 1) => get('/search/movie', { query, page }),

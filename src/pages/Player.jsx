@@ -5,8 +5,8 @@ import { tmdbServices, getImageUrl } from '../api/tmdb';
 import { useHistory } from '../context/HistoryContext';
 import { useContinueWatching } from '../context/ContinueWatchingContext';
 import { useToast } from '../context/ToastContext';
-import SectionRow from '../components/SectionRow';
-import './Player.css';
+import SectionSlider from '../components/SectionSlider';
+import Loader from '../components/Loader';
 
 const Player = () => {
   const { id, season, episode } = useParams();
@@ -17,27 +17,28 @@ const Player = () => {
 
   const [data, setData] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
-  const [tvDetails, setTVDetails] = useState(null);
-  const [currentSeasonData, setCurrentSeasonData] = useState(null);
+  const [seasonData, setSeasonData] = useState(null);
+  const [showData, setShowData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const isTV = !!season;
 
-  const fetchPlayerData = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       if (isTV) {
-        const [show, recs, seasonInfo] = await Promise.all([
+        const [show, recs, seasonDetails] = await Promise.all([
           tmdbServices.getTVDetails(id),
           tmdbServices.getTVRecommendations(id),
           tmdbServices.getSeasonDetails(id, season)
         ]);
-        setData(show);
-        setTVDetails(show);
-        setRecommendations(recs.results);
-        setCurrentSeasonData(seasonInfo);
 
-        const epInfo = seasonInfo.episodes.find(e => e.episode_number === Number(episode));
+        setData(show);
+        setShowData(show);
+        setRecommendations(recs.results);
+        setSeasonData(seasonDetails);
+
+        const currentEp = seasonDetails.episodes.find(e => e.episode_number === Number(episode));
 
         updateContinueWatching({
           id,
@@ -46,7 +47,7 @@ const Player = () => {
           poster: show.poster_path,
           season: Number(season),
           episode: Number(episode),
-          episodeTitle: epInfo?.name
+          episodeTitle: currentEp?.name
         });
 
         addToHistory({
@@ -57,13 +58,14 @@ const Player = () => {
           poster: show.poster_path,
           season,
           episode,
-          episodeTitle: epInfo?.name
+          episodeTitle: currentEp?.name
         });
       } else {
         const [movie, recs] = await Promise.all([
           tmdbServices.getMovieDetails(id),
           tmdbServices.getMovieRecommendations(id)
         ]);
+
         setData(movie);
         setRecommendations(recs.results);
 
@@ -90,142 +92,80 @@ const Player = () => {
   }, [id, season, episode, isTV, addToHistory, updateContinueWatching, addToast]);
 
   useEffect(() => {
-    fetchPlayerData();
+    fetchData();
     window.scrollTo(0, 0);
-  }, [fetchPlayerData]);
+  }, [fetchData]);
 
-  if (loading) return <div className="player-loading-full"><div className="spinner"></div><p>Loading Player...</p></div>;
-  if (!data) return <div className="error-state">Content not found</div>;
+  if (loading) return <Loader />;
+  if (!data) return <div className="h-screen flex items-center justify-center">Content not found</div>;
 
   const title = data.title || data.name;
-  const playerUrl = isTV
+  const embedUrl = isTV
     ? `https://embed.filmu.in/tv/${id}/${season}/${episode}`
     : `https://embed.filmu.in/movie/${id}`;
 
-  const handleNextEpisode = () => {
-    const currentEpNum = Number(episode);
-    const nextEp = currentSeasonData.episodes.find(e => e.episode_number === currentEpNum + 1);
-
-    if (nextEp) {
-      navigate(`/player/tv/${id}/${season}/${nextEp.episode_number}`);
-    } else {
-      // Check for next season
-      const nextSeason = tvDetails.seasons.find(s => s.season_number === Number(season) + 1);
-      if (nextSeason) {
-        navigate(`/player/tv/${id}/${nextSeason.season_number}/1`);
-      } else {
-        addToast('No more episodes', 'info');
-      }
-    }
-  };
-
-  const handlePrevEpisode = () => {
-    const currentEpNum = Number(episode);
-    if (currentEpNum > 1) {
-      navigate(`/player/tv/${id}/${season}/${currentEpNum - 1}`);
-    } else if (Number(season) > 1) {
-      const prevSeasonNum = Number(season) - 1;
-      // We don't have prev season episode count easily without fetching,
-      // but usually we can just navigate to s-1 e1 or similar.
-      // For simplicity, just toast or go to s-1 e1.
-      navigate(`/player/tv/${id}/${prevSeasonNum}/1`);
-    }
-  };
-
   return (
-    <div className="player-page-refined">
+    <div className="min-h-screen bg-background pt-24 pb-20">
       <Helmet>
-        <title>{isTV ? `${data.name} S${season}E${episode}` : data.title} | RoostMovies</title>
+        <title>{isTV ? `${data.name} S${season}E${episode}` : data.title} | CineVerse</title>
       </Helmet>
 
-      <div className="player-top-bar">
-        <button className="back-btn-styled" onClick={() => navigate(-1)}>
-          <i className="ri-arrow-left-line"></i>
-          <span>Back</span>
-        </button>
-        <div className="player-path">
-          <span className="path-main">{title}</span>
-          {isTV && (
-            <>
-              <i className="ri-arrow-right-s-line"></i>
-              <span className="path-sub">Season {season}</span>
-              <i className="ri-arrow-right-s-line"></i>
-              <span className="path-sub">Episode {episode}</span>
-            </>
-          )}
+      <div className="container mx-auto px-4 md:px-8 space-y-12">
+        {/* Breadcrumbs */}
+        <div className="flex items-center gap-2 text-sm font-bold text-white/40 uppercase tracking-widest">
+           <span className="text-primary">{isTV ? 'Series' : 'Film'}</span>
+           <span>/</span>
+           <span className="text-white">{title}</span>
+           {isTV && (
+             <>
+               <span>/</span>
+               <span className="text-accent">S{season} E{episode}</span>
+             </>
+           )}
         </div>
-      </div>
 
-      <div className={`player-layout ${isTV ? 'tv-layout' : 'movie-layout'}`}>
-        <div className="player-main-content">
-          <div className="iframe-container">
-            <iframe
-              src={playerUrl}
-              title={title}
-              frameBorder="0"
-              allowFullScreen
-              scrolling="no"
-            ></iframe>
+        {/* Player Container */}
+        <div className="relative aspect-video w-full rounded-[2rem] overflow-hidden border border-white/5 bg-black shadow-2xl">
+           <iframe
+             src={embedUrl}
+             title={title}
+             className="w-full h-full"
+             frameBorder="0"
+             allowFullScreen
+           />
+        </div>
+
+        {/* Content Info */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="lg:col-span-2 space-y-6">
+             <h1 className="text-4xl font-poppins font-black uppercase tracking-tighter">
+               {isTV ? `S${season} E${episode}: ${seasonData?.episodes.find(e => e.episode_number === Number(episode))?.name || title}` : title}
+             </h1>
+             <p className="text-lg text-white/60 leading-relaxed font-light">
+               {isTV ? seasonData?.episodes.find(e => e.episode_number === Number(episode))?.overview || data.overview : data.overview}
+             </p>
           </div>
 
-          <div className="content-info-section">
-            <div className="info-header">
-              <h1>{isTV ? `S${season} E${episode}: ${currentSeasonData?.episodes?.find(e => e.episode_number === Number(episode))?.name || title}` : title}</h1>
-              {isTV && (
-                <div className="ep-nav-btns">
-                  <button onClick={handlePrevEpisode} disabled={Number(season) === 1 && Number(episode) === 1}>
-                    <i className="ri-skip-back-fill"></i> Previous
-                  </button>
-                  <button onClick={handleNextEpisode}>
-                    Next <i className="ri-skip-forward-fill"></i>
-                  </button>
+          {/* Sidebar / More Like This */}
+          <div className="space-y-8">
+             <div className="glass p-6 rounded-3xl border border-white/5">
+                <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-primary mb-6">Quick Actions</h3>
+                <div className="flex flex-col gap-4">
+                   <button className="w-full py-4 glass rounded-xl font-bold hover:bg-white/10 transition-all border border-white/5">
+                     ADD TO WATCHLIST
+                   </button>
+                   <button className="w-full py-4 glass rounded-xl font-bold hover:bg-white/10 transition-all border border-white/5">
+                     SHARE ACCESS
+                   </button>
                 </div>
-              )}
-            </div>
-            <p className="player-overview-text">{isTV ? currentSeasonData?.episodes?.find(e => e.episode_number === Number(episode))?.overview || data.overview : data.overview}</p>
+             </div>
           </div>
         </div>
 
-        {isTV && (
-          <div className="player-sidebar">
-            <div className="sidebar-season-picker">
-              <label>Season</label>
-              <select
-                value={season}
-                onChange={(e) => navigate(`/player/tv/${id}/${e.target.value}/1`)}
-              >
-                {tvDetails?.seasons?.filter(s => s.season_number > 0).map(s => (
-                  <option key={s.id} value={s.season_number}>{s.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="sidebar-episodes">
-              <h3>Episodes</h3>
-              <div className="ep-list-scroll">
-                {currentSeasonData?.episodes?.map(ep => (
-                  <div
-                    key={ep.id}
-                    className={`ep-item ${Number(episode) === ep.episode_number ? 'active' : ''}`}
-                    onClick={() => navigate(`/player/tv/${id}/${season}/${ep.episode_number}`)}
-                  >
-                    <div className="ep-thumb">
-                      <img src={getImageUrl(ep.still_path, 'w300') || getImageUrl(data.backdrop_path, 'w300')} alt={ep.name} />
-                      <div className="ep-play-overlay"><i className="ri-play-fill"></i></div>
-                    </div>
-                    <div className="ep-details-mini">
-                      <span className="ep-num">Episode {ep.episode_number}</span>
-                      <p className="ep-name-mini" title={ep.name}>{ep.name}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="player-recommendations">
-        <SectionRow title="You Might Also Like" items={recommendations} type={isTV ? 'tv' : 'movie'} />
+        {/* Recommendations */}
+        <div className="pt-12">
+          <SectionSlider title="Recommended Transmissions" items={recommendations} type={isTV ? 'tv' : 'movie'} />
+        </div>
       </div>
     </div>
   );

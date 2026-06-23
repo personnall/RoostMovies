@@ -1,65 +1,50 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import Hero from '../components/Hero';
-import SectionRow from '../components/SectionRow';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { tmdbServices } from '../api/tmdb';
+import HeroBanner from '../components/HeroBanner';
+import SectionSlider from '../components/SectionSlider';
+import Loader from '../components/Loader';
 
 const Home = () => {
-  const [sections, setSections] = useState({
-    nowPlaying: { title: 'Now Playing', items: [], loading: true, type: 'movie' },
-    popularMovies: { title: 'Popular Movies', items: [], loading: true, type: 'movie' },
-    topRatedMovies: { title: 'Top Rated Movies', items: [], loading: true, type: 'movie' },
-    upcomingMovies: { title: 'Upcoming Movies', items: [], loading: true, type: 'movie' },
-    popularTV: { title: 'Popular TV Shows', items: [], loading: true, type: 'tv' },
-    topRatedTV: { title: 'Top Rated TV Shows', items: [], loading: true, type: 'tv' },
-    airingToday: { title: 'Airing Today on TV', items: [], loading: true, type: 'tv' },
+  const { data: trendingMovies, isLoading: trendingLoading } = useQuery({
+    queryKey: ['trending-movies'],
+    queryFn: () => tmdbServices.getPopularMovies(),
   });
 
-  const fetchSectionData = useCallback(async () => {
-    const fetchMap = {
-      nowPlaying: tmdbServices.getNowPlayingMovies,
-      popularMovies: tmdbServices.getPopularMovies,
-      topRatedMovies: tmdbServices.getTopRatedMovies,
-      upcomingMovies: tmdbServices.getUpcomingMovies,
-      popularTV: tmdbServices.getPopularTV,
-      topRatedTV: tmdbServices.getTopRatedTV,
-      airingToday: tmdbServices.getAiringToday,
-    };
+  const { data: popularTV, isLoading: tvLoading } = useQuery({
+    queryKey: ['popular-tv'],
+    queryFn: () => tmdbServices.getPopularTV(),
+  });
 
-    Object.entries(fetchMap).forEach(async ([key, fetchFn]) => {
-      try {
-        const res = await fetchFn();
-        setSections(prev => ({
-          ...prev,
-          [key]: { ...prev[key], items: res.results, loading: false }
-        }));
-      } catch (error) {
-        console.error(`Failed to fetch ${key}:`, error);
-        setSections(prev => ({
-          ...prev,
-          [key]: { ...prev[key], loading: false }
-        }));
-      }
-    });
-  }, []);
+  const { data: topRated, isLoading: topLoading } = useQuery({
+    queryKey: ['top-rated'],
+    queryFn: () => tmdbServices.getTopRatedMovies(),
+  });
 
-  useEffect(() => {
-    fetchSectionData();
-  }, [fetchSectionData]);
+  if (trendingLoading && !trendingMovies) return <Loader />;
 
   return (
-    <div className="home-page">
-      <Hero />
+    <div className="space-y-20 pb-20">
+      <HeroBanner movies={trendingMovies?.results} isLoading={trendingLoading} />
 
-      <div className="home-content">
-        {Object.entries(sections).map(([key, section]) => (
-          <SectionRow
-            key={key}
-            title={section.title}
-            items={section.items}
-            loading={section.loading}
-            type={section.type}
-          />
-        ))}
+      <div className="container mx-auto px-4 md:px-8 space-y-20 relative z-10">
+        <SectionSlider
+          title="Trending Now"
+          items={trendingMovies?.results}
+          type="movie"
+        />
+
+        <SectionSlider
+          title="Popular TV Shows"
+          items={popularTV?.results}
+          type="tv"
+        />
+
+        <SectionSlider
+          title="Top Rated Classics"
+          items={topRated?.results}
+          type="movie"
+        />
       </div>
     </div>
   );
